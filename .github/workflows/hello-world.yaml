@@ -1,0 +1,70 @@
+name: Build and Deploy Hello World service
+
+on:
+  push:
+    branches:
+      - main
+env:
+  PROJECT_ID: "sprints-lab"
+  GKE_CLUSTER: lab
+  GKE_ZONE: "us-central1-c"
+  GCR_ZONE: "us-central1"
+  GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+  IMAGE: hello-world
+  CHART_NAME: hello-world
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+      # Configure docker to use the gcloud command-line tool as a credential helper
+      - run: |-
+          gcloud --quiet auth configure-docker
+
+      # Get the GKE credentials so we can deploy to the cluster
+      - uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+
+      - name: Add short sha env
+        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
+
+        # Build the Docker image
+      - name: Build
+        run: |-
+          docker build \
+            -f Dockerfile \
+            --tag "$GCR_ZONE/$PROJECT_ID/$IMAGE:${GITHUB_REF##*/}-$SHORT_SHA" \
+            --tag "$GCR_ZONE/$PROJECT_ID/$IMAGE:${GITHUB_REF##*/}-latest" \
+            --build-arg GITHUB_SHA="$GITHUB_SHA" \
+            --build-arg GITHUB_HEAD_REF="$GITHUB_HEAD_REF" \
+            .
+
+      # Push the Docker image to Google Container Registry
+      - name: Publish
+        run: |-
+          docker push "$GCR_ZONE/$PROJECT_ID/$IMAGE:${GITHUB_REF##*/}-$SHORT_SHA"
+          docker push "$GCR_ZONE/$PROJECT_ID/$IMAGE:${GITHUB_REF##*/}-latest"
+
+      # - name: Deploy to staging
+      #   if: github.ref == 'refs/heads/main'
+      #   working-directory: ./helm
+      #   run: |-
+      #     helm repo update
+      #     helm upgrade  --install "$CHART_NAME"  "private/$CHART_NAME" \
+      #     --set base.image.stableTag="${GITHUB_REF##*/}-$SHORT_SHA" \
+      #     --set base.ingress.host="hello-world-staging.lab.com" \
+      #     --version="1.0.0-${GITHUB_REF##*/}-$SHORT_SHA" \
+      #     -f values.yaml -n "staging"
