@@ -3,7 +3,7 @@ name: Build and Deploy Hello World service
 on:
   push:
     branches:
-      - main
+      - master
 env:
   PROJECT_ID: "sprints-lab"
   GKE_CLUSTER: lab
