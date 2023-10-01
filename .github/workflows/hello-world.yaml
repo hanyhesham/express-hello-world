@@ -8,7 +8,7 @@ env:
   PROJECT_ID: "sprints-lab"
   GKE_CLUSTER: lab
   GKE_ZONE: "us-central1-c"
-  GCR_ZONE: "us-central1"
+  GCR_ZONE: "us.gcr.io"
   GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
   IMAGE: hello-world
 
