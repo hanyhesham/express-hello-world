@@ -59,4 +59,4 @@ jobs:
 
       - name: Deploy to dev
         run: |-
-          kubectl apply -f k8s/deployment.yaml -n dev
+          kubectl apply -f ./k8s/ -n dev
