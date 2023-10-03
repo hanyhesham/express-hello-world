@@ -57,13 +57,6 @@ jobs:
           docker push "$GCR_ZONE/$PROJECT_ID/$IMAGE:${GITHUB_REF##*/}-$SHORT_SHA"
           docker push "$GCR_ZONE/$PROJECT_ID/$IMAGE:${GITHUB_REF##*/}-latest"
 
-      # - name: Deploy to staging
-      #   if: github.ref == 'refs/heads/main'
-      #   working-directory: ./helm
-      #   run: |-
-      #     helm repo update
-      #     helm upgrade  --install "$CHART_NAME"  "private/$CHART_NAME" \
-      #     --set base.image.stableTag="${GITHUB_REF##*/}-$SHORT_SHA" \
-      #     --set base.ingress.host="hello-world-staging.lab.com" \
-      #     --version="1.0.0-${GITHUB_REF##*/}-$SHORT_SHA" \
-      #     -f values.yaml -n "staging"
+      - name: Deploy to dev
+        run: |-
+          kubectl apply -f k8s/deployment.yaml -n dev

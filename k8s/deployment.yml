@@ -3,14 +3,21 @@ kind: Deployment
 metadata:
   name: hello-world-deployment
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
-      labels: # labels to select/identify the deployment
+      labels:
         app: hello-world  
-    spec:     # pod spec                  
+    spec:            
       containers: 
       - name: hello-world 
-        image: gcr.io/phineasrt/hello-world-image:v1 # image we pushed
+        image: us.gcr.io/sprints-lab/hello-world:latest
         ports:
-        - containerPort: 3000
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "300m"
+            memory: "512Mi"

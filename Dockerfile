@@ -1,5 +1,4 @@
 FROM node:7.7-alpine
-MAINTAINER Jatin Shridhar <shridhar.jatin@gmail.com>
 
 # install deps
 ADD package.json /tmp/package.json
@@ -13,5 +12,5 @@ WORKDIR /opt/hello-world-app
 COPY . /opt/hello-world-app
 
 # run
-EXPOSE 3000
+EXPOSE 8000
 CMD ["npm", "start"]
