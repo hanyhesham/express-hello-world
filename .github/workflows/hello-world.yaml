@@ -45,8 +45,8 @@ jobs:
         run: |-
           docker build \
             -f Dockerfile \
-            --tag "$GCR_ZONE/$PROJECT_ID/$IMAGE:${GITHUB_REF##*/}-$SHORT_SHA" \
-            --tag "$GCR_ZONE/$PROJECT_ID/$IMAGE:${GITHUB_REF##*/}-latest" \
+            --tag "$GCR_ZONE/$PROJECT_ID/$IMAGE:$SHORT_SHA" \
+            --tag "$GCR_ZONE/$PROJECT_ID/$IMAGE:latest" \
             --build-arg GITHUB_SHA="$GITHUB_SHA" \
             --build-arg GITHUB_HEAD_REF="$GITHUB_HEAD_REF" \
             .
@@ -54,8 +54,8 @@ jobs:
       # Push the Docker image to Google Container Registry
       - name: Publish
         run: |-
-          docker push "$GCR_ZONE/$PROJECT_ID/$IMAGE:${GITHUB_REF##*/}-$SHORT_SHA"
-          docker push "$GCR_ZONE/$PROJECT_ID/$IMAGE:${GITHUB_REF##*/}-latest"
+          docker push "$GCR_ZONE/$PROJECT_ID/$IMAGE:$SHORT_SHA"
+          docker push "$GCR_ZONE/$PROJECT_ID/$IMAGE:latest"
 
       - name: Deploy to dev
         run: |-
