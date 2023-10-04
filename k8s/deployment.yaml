@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: hello-world
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: hello-world 
@@ -16,7 +16,7 @@ spec:
       - name: hello-world 
         image: us.gcr.io/sprints-lab/hello-world:latest
         ports:
-        - containerPort: 8000
+        - containerPort: 3000
         resources:
           requests:
             cpu: "50m"
